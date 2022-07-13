@@ -43,16 +43,18 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
 
         $productName = $data->get('productName');
         $productPrice = $data->get('productPrice');
-        $productMediaCoverId = $data->get('productMediaCoverId');
+        $productMediaCoverUrl = $data->get('productMediaCoverUrl');
         // TODO: Slice Variants
 
         return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
-          'name' => $productName,
-          'price' => $productPrice
+            'coverUrl' => $productMediaCoverUrl,
+            'name' => $productName,
+            'price' => $productPrice
         ]);
     }
-    // TODO: Handle Form from buy widget
+
 
     // TODO: Handle Form from shopping cart
+
 
 }

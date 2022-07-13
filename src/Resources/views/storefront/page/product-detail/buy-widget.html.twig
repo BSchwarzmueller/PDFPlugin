@@ -196,11 +196,11 @@
             <div class="col-12 col-md-6">
                 {# TODO: IF Enable Condition #}
                 {% block page_product_detail_generate_pdf %}
-                    {# TODO: Form with Controller #}
+                    {% set productMedia = page.product.media|first %}
                     <form action="/generatePDFProductDetail" method="get">
                         <input type="hidden" name="productName" value="{{ page.product.translated.name }}">
                         <input type="hidden" name="productPrice" value="{{ page.product.calculatedPrice.unitPrice }}">
-                        <input type="hidden" name="productMediaCoverId" value="{{ page.product.coverId }}">
+                        <input type="hidden" name="productMediaCoverUrl" value="{{ productMedia.media.url }}">
 
                         {% for variant in page.product.variation %}
                             <input type="hidden" name="{{ variant.group }}" value="{{ variant.option }}">
