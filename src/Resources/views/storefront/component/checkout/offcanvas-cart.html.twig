@@ -189,23 +189,25 @@
                 </div>
             {% endblock %}
 
-            {% block component_offcanvas_cart_actions_generate_pdf %}
-                <form action="/generatePDFShoppingCart" method="get">
-                    {% for key, lineItem in page.cart.lineItems %}
-                        <input type="hidden" name="productName-{{ key }}" value="{{ lineItem.label }}">
-                        <input type="hidden" name="productPrice-{{ key }}" value="{{ lineItem.price.unitPrice }}">
-                        <input type="hidden" name="productMediaCoverUrl-{{ key }}" value="{{ lineItem.cover.url }}">
+            {% if config('PDFPlugin.config.showPDFBtnInShoppingCart') %}
+                {% block component_offcanvas_cart_actions_generate_pdf %}
+                    <form action="/generatePDFShoppingCart" method="get">
+                        {% for key, lineItem in page.cart.lineItems %}
+                            <input type="hidden" name="productName-{{ key }}" value="{{ lineItem.label }}">
+                            <input type="hidden" name="productPrice-{{ key }}" value="{{ lineItem.price.unitPrice }}">
+                            <input type="hidden" name="productMediaCoverUrl-{{ key }}" value="{{ lineItem.cover.url }}">
 
-                        {% for variant in lineItem.payload.options %}
-                            <input type="hidden" name="{{ variant.group }}-{{ key }}" value="{{ variant.option }}">
+                            {% for variant in lineItem.payload.options %}
+                                <input type="hidden" name="{{ variant.group }}-{{ key }}" value="{{ variant.option }}">
+                            {% endfor %}
+
                         {% endfor %}
-
-                    {% endfor %}
-                    <input type="submit" value="PDF" class="btn btn-secondary" {% if page.cart.lineItems is empty %} disabled {% endif %}/>
-                    {#            TODO: PDF Symbol #}
-                </form>
-            {% endblock %}
-
+                        <input type="submit" value="PDF"
+                               class="btn btn-secondary" {% if page.cart.lineItems is empty %} disabled {% endif %}/>
+                        {#            TODO: PDF Symbol #}
+                    </form>
+                {% endblock %}
+            {% endif %}
         </div>
 
         {% block component_offcanvas_cart_hidden_line_items_information %}

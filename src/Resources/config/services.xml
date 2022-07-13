@@ -7,11 +7,12 @@
     <services>
         <service id="PDFPlugin\Storefront\Controller\GeneratePDFController" public="true">
             <!--                TDOD: Inject Media Rep-->
-            <argument type="service" id="Shopware\Core\Checkout\Document\DocumentService" />
+            <argument type="service" id="Shopware\Core\Checkout\Document\DocumentService"/>
             <call method="setContainer">
 
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+
     </services>
 </container>
