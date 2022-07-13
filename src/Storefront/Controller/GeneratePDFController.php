@@ -46,13 +46,14 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
 
         $variants = [];
 
-        foreach($data as $key=>$val) {
-            if($key == 'productName' || $key == 'productPrice' || $key == 'productMediaCoverUrl') {
+        foreach ($data as $key => $val) {
+            if ($key == 'productName' || $key == 'productPrice' || $key == 'productMediaCoverUrl') {
                 continue;
             }
             $variants[] = "{$key}: {$val}";
         }
 
+        // TODO: Replace with Document Service ?
         return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
             'coverUrl' => $productMediaCoverUrl,
             'name' => $productName,
@@ -61,4 +62,35 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
         ]);
     }
 
+    /**
+     * @RouteScope (scopes={"storefront"})
+     * @Route("/generatePDFShoppingCart", name="frontend.generate.pdf.shopping.cart", methods={"GET"})
+     *
+     * @param Request $request
+     * @param QueryDataBag $data
+     * @param SalesChannelContext $context
+     * @return Response
+     */
+    public function handleShoppingCartForm(Request $request, QueryDataBag $data, SalesChannelContext $context): Response
+    {
+        $lineItems = [];
+        $itemId = 0;
+
+        foreach ($data as $key => $val) {
+            $slicedArray = explode('-', $key);
+            $key = $slicedArray[0];
+            $currentItemId = $slicedArray[1];
+
+            if($itemId != $currentItemId) {
+                $itemId = $currentItemId;
+                $lineItems[$itemId] = [];
+            }
+            $lineItem = [$key => $val];
+            $lineItems[$itemId][] = $lineItem;
+        }
+
+        return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/shoppingCartPDFTemplate.html.twig', [
+            'lineItems' => $lineItems
+        ]);
+    }
 }
