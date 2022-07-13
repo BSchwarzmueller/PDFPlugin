@@ -3,12 +3,15 @@
 namespace PDFPlugin\Storefront\Controller;
 
 use Shopware\Core\Checkout\Document\DocumentService;
+use Shopware\Core\Framework\Adapter\Twig\TwigEnvironment;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Dompdf\Dompdf;
+use Twig\Loader\FilesystemLoader;
 
 
 /**
@@ -16,15 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontController
 {
-
-    // TODO: Generate PDF with Document Service
-    public function __construct(
-        DocumentService $documentService
-    )
-    {
-    }
-
-
     /**
      * @RouteScope (scopes={"storefront"})
      * @Route("/generatePDFProductDetail", name="frontend.generate.pdf.product.detail", methods={"GET"})
@@ -34,7 +28,7 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
      * @param SalesChannelContext $context
      * @return Response
      */
-    public function handleProductDetailForm(Request $request, QueryDataBag $data, SalesChannelContext $context): Response
+    public function handleProductDetailForm(Request $request, QueryDataBag $data, SalesChannelContext $context): void
     {
 
         $productName = $data->get('productName');
@@ -50,14 +44,40 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
             $variants[] = "{$key}: {$val}";
         }
 
-        // TODO: Replace with Document Service ?
-        return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
-            'coverUrl' => $productMediaCoverUrl,
-            'name' => $productName,
-            'price' => $productPrice,
-            'variants' => $variants
-        ]);
+        $this->showPDF('detail', $productName, $productMediaCoverUrl, $productPrice, $variants, null);
+
     }
+
+    private function showPDF( $type, $productName, $productMediaCoverUrl, $productPrice, $productVariants, $lineItems): void
+    {
+        $loader = new FilesystemLoader(__DIR__ . '/Templates');
+        $twig = new TwigEnvironment($loader);
+
+        if($type=='detail')
+        {
+            $html = $twig->render('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
+                'coverUrl' => $productMediaCoverUrl,
+                'name' => $productName,
+                'price' => $productPrice,
+                'variants' => $productVariants
+            ]);
+        }
+
+        if($type=='cart')
+        {
+            $html = $twig->render('@PHPPlugin/storefront/page/product-detail/shoppingCartPDFTemplate.html.twig', [
+                'lineItems' => $lineItems
+            ]);
+        }
+
+        $dompdf = new DOMPDF();
+
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $dompdf->stream('document.pdf');
+    }
+
 
     /**
      * @RouteScope (scopes={"storefront"})
@@ -78,7 +98,7 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
             $key = $slicedArray[0];
             $currentItemId = $slicedArray[1];
 
-            if($itemId != $currentItemId) {
+            if ($itemId != $currentItemId) {
                 $itemId = $currentItemId;
                 $lineItems[$itemId] = [];
             }
@@ -86,8 +106,6 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
             $lineItems[$itemId][] = $lineItem;
         }
 
-        return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/shoppingCartPDFTemplate.html.twig', [
-            'lineItems' => $lineItems
-        ]);
+        $this->showPDF('cart', null, null, null, null, $lineItems);
     }
 }
