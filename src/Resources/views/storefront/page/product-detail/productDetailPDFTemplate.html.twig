@@ -1,7 +1,22 @@
-<tr>
-    <td>
-        <img src="{{ coverUrl }}" />
-    </td>
-    <td>{{ name }}</td>
-    <td>{{ price }}</td>
-</tr>
+<table>
+    <tr>
+        <th></th>
+        <th>Bezeichnung</th>
+        <th>Preis</th>
+        <th>Variante</th>
+    </tr>
+{#    TODO: Localization#}
+    <tr>
+        <td>
+            <img src="{{ coverUrl }}" style="height:100px; width:100px; object-fit: cover;"/>
+        </td>
+        <td>{{ name }}</td>
+        <td>{{ price }}</td>
+        <td>
+            {% for variant in variants %}
+                {{ variant }}<br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+</table>

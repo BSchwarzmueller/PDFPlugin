@@ -39,22 +39,26 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
      */
     public function handleProductDetailForm(Request $request, QueryDataBag $data, SalesChannelContext $context): Response
     {
-//        TODO: HTML Template
 
         $productName = $data->get('productName');
         $productPrice = $data->get('productPrice');
         $productMediaCoverUrl = $data->get('productMediaCoverUrl');
-        // TODO: Slice Variants
+
+        $variants = [];
+
+        foreach($data as $key=>$val) {
+            if($key == 'productName' || $key == 'productPrice' || $key == 'productMediaCoverUrl') {
+                continue;
+            }
+            $variants[] = "{$key}: {$val}";
+        }
 
         return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
             'coverUrl' => $productMediaCoverUrl,
             'name' => $productName,
-            'price' => $productPrice
+            'price' => $productPrice,
+            'variants' => $variants
         ]);
     }
-
-
-    // TODO: Handle Form from shopping cart
-
 
 }
