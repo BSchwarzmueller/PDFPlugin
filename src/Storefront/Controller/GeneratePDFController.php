@@ -17,10 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontController
 {
 
-
-    // TODO: Import Product Media Repository in constructor
-
-    // TODO: Generate PDF
+    // TODO: Generate PDF with Document Service
     public function __construct(
         DocumentService $documentService
     )

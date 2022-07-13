@@ -1,0 +1,38 @@
+<table>
+    <tr>
+        <th></th>
+        <th>Bezeichnung</th>
+        <th>Preis</th>
+        <th>Variante</th>
+    </tr>
+    {#    TODO: Localization #}
+
+    {% for lineItem in lineItems %}
+
+        {% set name = lineItem[0]['productName'] %}
+        {% set price = lineItem[1]['productPrice'] %}
+        {% set mediaUrl = lineItem[2]['productMediaCoverUrl'] %}
+
+        {% set itemsIndex = ((lineItem|length - 3) + 1) %}
+        {% set variants = [] %}
+        {% for i in range(itemsIndex, lineItem|length) %}
+            {% set variants = variants|merge([lineItem[i]]) %}
+        {% endfor %}
+
+        <tr>
+            <td>
+                <img src="{{ mediaUrl }}" style="height:100px; width:100px; object-fit: cover;"/>
+            </td>
+            <td>{{ name }}</td>
+            <td>{{ price }}</td>
+            <td>
+                {% for variant in variants %}
+                    {% for key, item in variant %}
+                        {{ key }}: {{ item }}
+                        <br/>
+                    {% endfor %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
