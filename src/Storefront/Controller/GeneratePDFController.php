@@ -2,13 +2,13 @@
 
 namespace PDFPlugin\Storefront\Controller;
 
+use Shopware\Core\Checkout\Document\DocumentService;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Slim\Http\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 
 
 /**
@@ -17,9 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontController
 {
 
+
     // TODO: Import Product Media Repository in constructor
 
     // TODO: Generate PDF
+    public function __construct(
+        DocumentService $documentService
+    )
+    {
+    }
 
 
     /**
@@ -33,7 +39,17 @@ class GeneratePDFController extends \Shopware\Storefront\Controller\StorefrontCo
      */
     public function handleProductDetailForm(Request $request, QueryDataBag $data, SalesChannelContext $context): Response
     {
-        dd($data);
+//        TODO: HTML Template
+
+        $productName = $data->get('productName');
+        $productPrice = $data->get('productPrice');
+        $productMediaCoverId = $data->get('productMediaCoverId');
+        // TODO: Slice Variants
+
+        return $this->renderStorefront('@PHPPlugin/storefront/page/product-detail/productDetailPDFTemplate.html.twig', [
+          'name' => $productName,
+          'price' => $productPrice
+        ]);
     }
     // TODO: Handle Form from buy widget
 
